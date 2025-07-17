@@ -1,9 +1,85 @@
-:root {
-  font-family: Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
+@theme {
+  --blue-primary: #1f3756 --blue-secondary: #141539 --text-xl: 1.5rem;
+  --text-xl--line-height: 2rem;
+  --text-xl--font-weight: 700;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.5rem;
+  --text-lg--font-weight: 700;
+  --text-md: 0.875rem;
+  --text-md--line-height: 1.125rem;
+  --text-md--font-weight: 600;
+  --text-sm: 0.75rem;
+  --text-sm--line-height: 1rem;
+  --text-sm--font-weight: 500;
+  --text-xs: 0.625rem;
+  --text-xs--line-height: 0.875rem;
+  --text-xs--font-weight: 400;
+  --breakpoint-3xl: 85.375rem;
+  --text-xxs: 0.625rem;
+  --animate-border: border 2s linear infinite;
+  @keyframes border {
+    0% {
+      --border-angle: 0deg;
+    }
+    100% {
+      --border-angle: 360deg;
+    }
+  }
+  --animate-fast-spin: fastspin 0.5s linear infinite;
+  @keyframes fastspin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+body {
+  background-image: radial-gradient(
+    circle at top,
+    var(--blue-primary),
+    var(--blue-secondary)
+  );
+}
+
+@layer components {
+  .page {
+    @apply relative z-0 flex h-auto w-screen flex-col;
+  }
+  .bg-circle {
+    @apply bg-radial from-[#1f3756] to-[#141539] bg-fixed bg-center bg-no-repeat;
+  }
+  .border-active {
+    @apply animate-border box-border border-[2px] border-transparent;
+    background:
+      linear-gradient(
+          45deg,
+          var(--gray-100),
+          var(--gray-100) 50%,
+          var(--gray-100)
+        )
+        padding-box,
+      conic-gradient(
+          from var(--border-angle),
+          var(--border-start, var(--gray-100)) 80%,
+          var(--border-middle, var(--blue-primary)) 86%,
+          var(--border-glow, var(--blue-secondary)) 90%,
+          var(--border-middle, var(--blue-primary)) 94%,
+          var(--border-end, var(--gray-200)) 100%
+        )
+        border-box;
+  }
+}
+
+:root {
+  font-family: "Open Sans", sans-serif;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
