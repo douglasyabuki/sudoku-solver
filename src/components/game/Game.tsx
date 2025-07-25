@@ -23,7 +23,7 @@ const isValidPlacement = (
   return true;
 };
 
-const DELAY = 20; // Delay in milliseconds for the solving animation
+const DELAY = 2; // Delay in milliseconds for the solving animation
 
 const initialBoard: Cell[][] = Array(9).fill(
   Array(9).fill({ value: 0, isFixed: false, error: false }),
