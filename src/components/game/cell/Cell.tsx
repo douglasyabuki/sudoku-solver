@@ -16,8 +16,8 @@ export const Cell = ({ className, value, onChange, isFixed, error }: Cell) => {
       onFocus={(e) => e.target.select()}
       className={twMerge(
         "flex size-8 items-center justify-center bg-white text-center text-gray-600 ring-1 ring-black/20 duration-150 outline-none ring-inset focus:ring-2 focus:ring-[var(--blue-secondary)] md:size-10 lg:size-12",
-        error && "text-red-800",
         isFixed && "font-bold text-black",
+        error && "text-red-800",
         className,
       )}
       type="text"
