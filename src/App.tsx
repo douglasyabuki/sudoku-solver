@@ -1,8 +1,12 @@
-export const App = () => {
+import { Game } from "./components/game/Game";
+import { ToastProvider } from "./components/ui/toast/toast-context/ToastProvider";
 
+export const App = () => {
   return (
-    <main className="page">
-      <div className="bg-circle h-screen">Hi</div>
-    </main>
-  )
-}
+    <ToastProvider>
+      <main className="page">
+        <Game />
+      </main>
+    </ToastProvider>
+  );
+};
