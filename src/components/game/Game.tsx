@@ -33,6 +33,7 @@ export const Game = () => {
   const [board, setBoard] = useState(initialBoard);
   const [isValidPuzzle, setIsValidPuzzle] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
+  const [isStepSolutionToggled, setIsStepSolutionToggled] = useState(false);
   const [steps, setSteps] = useState(0);
   const { pushToast } = useToast();
 
@@ -41,7 +42,8 @@ export const Game = () => {
     setSteps(0);
 
     const solve = async (): Promise<boolean> => {
-      await new Promise((resolve) => setTimeout(resolve, DELAY));
+      if (isStepSolutionToggled)
+        await new Promise((resolve) => setTimeout(resolve, DELAY));
       setBoard(() => _board);
       setSteps((prev) => prev + 1);
 
@@ -65,7 +67,7 @@ export const Game = () => {
 
     setBoard(_board);
     setIsSolved(true);
-  }, [board]);
+  }, [board, isStepSolutionToggled]);
 
   return (
     <div className="bg-circle flex h-screen flex-col items-center justify-center gap-6 py-20 md:justify-start md:gap-12 md:py-36">
@@ -100,6 +102,8 @@ export const Game = () => {
           setIsValidPuzzle(false);
           setIsSolved(false);
         }}
+        isStepSolutionToggled={isStepSolutionToggled}
+        onStepSolutionToggle={() => setIsStepSolutionToggled((prev) => !prev)}
         isPuzzleSolved={isSolved}
         isClearDisabled={!board.some((r) => r.some(({ value }) => value !== 0))}
         onPuzzleValidate={() => {

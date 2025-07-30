@@ -16,6 +16,21 @@ export const Icons = {
       <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z" />
     </svg>
   ),
+  ForwardStep: ({ className, ...props }: Icon) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={twMerge("size-6 fill-current", className)}
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16 6v12M8 6v12l8-6-8-6Z"
+        className="stroke-current stroke-1"
+      />
+    </svg>
+  ),
   NotificationError: ({ className, ...props }: Icon) => (
     <svg
       viewBox="0 0 24 24"
@@ -54,6 +69,21 @@ export const Icons = {
       {...props}
     >
       <path d="M12 6.49L19.53 19.5H4.47L12 6.49ZM12 2.5L1 21.5H23L12 2.5ZM13 16.5H11V18.5H13V16.5ZM13 10.5H11V14.5H13V10.5Z" />
+    </svg>
+  ),
+  Play: ({ className, ...props }: Icon) => (
+    <svg
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      className={twMerge("size-6 fill-current", className)}
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8 18V6l8 6-8 6Z"
+        className="stroke-current stroke-1"
+      />
     </svg>
   ),
 };
