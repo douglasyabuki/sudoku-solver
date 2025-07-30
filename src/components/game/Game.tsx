@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../ui/toast/toast-context/ToastContext";
 import { Actions } from "./actions/Actions";
 import { Board } from "./board/Board";
+import { StepTracker } from "./step-tracker/StepTracker";
 
 const isValidPlacement = (
   board: Cell[][],
@@ -78,9 +79,21 @@ export const Game = () => {
 
   return (
     <div className="bg-circle flex h-screen flex-col items-center justify-center gap-6 py-20 md:justify-start md:gap-12 md:py-36">
-      <p className="rounded-full bg-white/10 px-4 py-1 text-white">
-        Step count: {steps}
-      </p>
+      <StepTracker
+        steps={steps}
+        isStepSolutionToggled={isStepSolutionToggled}
+        onStepSolutionToggle={() => {
+          const _isStepSolutionToggled = !isStepSolutionToggled;
+          setIsStepSolutionToggled(_isStepSolutionToggled);
+          pushToast({
+            variant: "success",
+            title: _isStepSolutionToggled ? "Step by step mode" : "Fast mode",
+            description: _isStepSolutionToggled
+              ? "The puzzle will be solved step by step."
+              : "The puzzle will be solved at once.",
+          });
+        }}
+      />
 
       <Board
         board={board}
@@ -110,8 +123,6 @@ export const Game = () => {
           setIsValidPuzzle(false);
           setIsSolved(false);
         }}
-        isStepSolutionToggled={isStepSolutionToggled}
-        onStepSolutionToggle={() => setIsStepSolutionToggled((prev) => !prev)}
         isPuzzleSolved={isSolved}
         isClearDisabled={!board.some((r) => r.some(({ value }) => value !== 0))}
         onPuzzleValidate={() => {
