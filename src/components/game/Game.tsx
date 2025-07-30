@@ -1,7 +1,7 @@
 import type { Cell } from "@/types/types";
 import { deepClone } from "@/utils/deep-clone";
 import { countSolutions, findErrors } from "@/utils/sudoku-utils";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../ui/toast/toast-context/ToastContext";
 import { Actions } from "./actions/Actions";
 import { Board } from "./board/Board";
@@ -23,7 +23,7 @@ const isValidPlacement = (
   return true;
 };
 
-const DELAY = 2; // Delay in milliseconds for the solving animation
+const DELAY = 2;
 
 const initialBoard: Cell[][] = Array(9).fill(
   Array(9).fill({ value: 0, isFixed: false, error: false }),
@@ -37,14 +37,21 @@ export const Game = () => {
   const [steps, setSteps] = useState(0);
   const { pushToast } = useToast();
 
+  // Ref to hold live toggle state
+  const isStepSolutionToggledRef = useRef(isStepSolutionToggled);
+
+  useEffect(() => {
+    isStepSolutionToggledRef.current = isStepSolutionToggled;
+  }, [isStepSolutionToggled]);
+
   const handlePuzzleSolve = useCallback(async () => {
     const _board = deepClone(board);
     setSteps(0);
 
     const solve = async (): Promise<boolean> => {
-      if (isStepSolutionToggled)
+      if (isStepSolutionToggledRef.current)
         await new Promise((resolve) => setTimeout(resolve, DELAY));
-      setBoard(() => _board);
+      setBoard(() => deepClone(_board));
       setSteps((prev) => prev + 1);
 
       for (let r = 0; r < 9; r++) {
@@ -63,11 +70,11 @@ export const Game = () => {
       }
       return true;
     };
-    await solve();
 
+    await solve();
     setBoard(_board);
     setIsSolved(true);
-  }, [board, isStepSolutionToggled]);
+  }, [board]);
 
   return (
     <div className="bg-circle flex h-screen flex-col items-center justify-center gap-6 py-20 md:justify-start md:gap-12 md:py-36">
@@ -94,6 +101,7 @@ export const Game = () => {
         }}
         isSolved={isSolved}
       />
+
       <Actions
         isValidPuzzle={isValidPuzzle}
         onClear={() => {
