@@ -8,3 +8,5 @@ export interface Cell {
   isFixed: boolean;
   error: boolean;
 }
+
+export type SolutionStatus = "unsolved" | "solving" | "solved";

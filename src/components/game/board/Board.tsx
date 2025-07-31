@@ -1,19 +1,19 @@
-import type { Cell as CellType } from "@/types/types";
+import type { Cell as CellType, SolutionStatus } from "@/types/types";
 import { twMerge } from "tailwind-merge";
 import { Cell } from "../cell/Cell";
 
 interface Board {
   board: CellType[][];
   onCellChange: (rowId: number, colId: number, newValue: number) => void;
-  isSolved: boolean;
+  solutionStatus: SolutionStatus;
 }
 
-export const Board = ({ board, onCellChange, isSolved }: Board) => {
+export const Board = ({ board, onCellChange, solutionStatus }: Board) => {
   return (
     <div
       className={twMerge(
         "flex flex-col border-[8px] border-slate-500/50",
-        isSolved && "border-active",
+        solutionStatus === "solved" && "border-active",
       )}
     >
       {board.map((row, rowId) => (
@@ -38,6 +38,7 @@ export const Board = ({ board, onCellChange, isSolved }: Board) => {
               isFixed={isFixed}
               error={error}
               key={`cell-r${rowId}-c${colId}`}
+              isDisabled={solutionStatus === "solving"}
             />
           ))}
         </div>

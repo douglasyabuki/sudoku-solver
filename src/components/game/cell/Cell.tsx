@@ -5,9 +5,10 @@ import { twMerge } from "tailwind-merge";
 interface Cell extends CellContent {
   className?: string;
   onChange: (newValue: number) => void;
+  isDisabled: boolean;
 }
 
-export const Cell = ({ className, value, onChange, isFixed, error }: Cell) => {
+export const Cell = ({ className, value, onChange, isFixed, error, isDisabled }: Cell) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -34,6 +35,7 @@ export const Cell = ({ className, value, onChange, isFixed, error }: Cell) => {
         }
       }}
       value={value || ""}
+      disabled={isDisabled}
     />
   );
 };

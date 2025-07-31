@@ -1,5 +1,5 @@
 import { Icons } from "@/icons/Icons";
-import type { Cell } from "@/types/types";
+import type { Cell, SolutionStatus } from "@/types/types";
 import { deepClone } from "@/utils/deep-clone";
 import {
   countSolutions,
@@ -39,7 +39,8 @@ const initialBoard: Cell[][] = Array(9).fill(
 export const Game = () => {
   const [board, setBoard] = useState(initialBoard);
   const [isValidPuzzle, setIsValidPuzzle] = useState(false);
-  const [isSolved, setIsSolved] = useState(false);
+  const [solutionStatus, setSolutionStatus] =
+    useState<SolutionStatus>("unsolved");
   const [isStepSolutionToggled, setIsStepSolutionToggled] = useState(false);
   const [steps, setSteps] = useState(0);
   const { pushToast } = useToast();
@@ -51,36 +52,76 @@ export const Game = () => {
     isStepSolutionToggledRef.current = isStepSolutionToggled;
   }, [isStepSolutionToggled]);
 
-  const handlePuzzleSolve = useCallback(async () => {
+  const handlePuzzleSolve = useCallback(() => {
     const _board = deepClone(board);
     setSteps(0);
+    setSolutionStatus("solving");
 
-    const solve = async (): Promise<boolean> => {
-      if (isStepSolutionToggledRef.current)
-        await new Promise((resolve) => setTimeout(resolve, DELAY));
-      setBoard(() => deepClone(_board));
-      setSteps((prev) => prev + 1);
+    const stack: { row: number; col: number; nextDigit: number }[] = [];
+    let done = false;
 
+    const findNextEmpty = () => {
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-          if (_board[r][c].value === 0) {
-            for (let d = 1; d <= 9; d++) {
-              if (isValidPlacement(_board, r, c, d)) {
-                _board[r][c].value = d;
-                if (await solve()) return true;
-                _board[r][c].value = 0;
-              }
-            }
-            return false;
-          }
+          if (_board[r][c].value === 0) return { r, c };
         }
       }
-      return true;
+      return null;
     };
 
-    await solve();
-    setBoard(_board);
-    setIsSolved(true);
+    const solveStep = () => {
+      while (!done) {
+        const empty = findNextEmpty();
+        if (!empty) {
+          done = true;
+          setSolutionStatus("solved");
+          setBoard(deepClone(_board));
+          return;
+        }
+
+        const { r, c } = empty;
+        let placed = false;
+
+        for (let d = 1; d <= 9; d++) {
+          if (isValidPlacement(_board, r, c, d)) {
+            _board[r][c].value = d;
+            stack.push({ row: r, col: c, nextDigit: d + 1 });
+            placed = true;
+            break;
+          }
+        }
+
+        if (!placed) {
+          while (stack.length > 0) {
+            const { row, col, nextDigit } = stack.pop()!;
+            let found = false;
+            for (let d = nextDigit; d <= 9; d++) {
+              if (isValidPlacement(_board, row, col, d)) {
+                _board[row][col].value = d;
+                stack.push({ row, col, nextDigit: d + 1 });
+                found = true;
+                break;
+              }
+            }
+
+            if (found) break;
+            else _board[row][col].value = 0;
+          }
+        }
+
+        setSteps((prev) => prev + 1);
+
+        if (isStepSolutionToggledRef.current) {
+          setBoard(deepClone(_board));
+          setTimeout(solveStep, DELAY);
+          return;
+        }
+      }
+
+      setBoard(deepClone(_board));
+    };
+
+    solveStep();
   }, [board]);
 
   return (
@@ -117,9 +158,9 @@ export const Game = () => {
             });
             setBoard(copy);
             setIsValidPuzzle(false);
-            setIsSolved(false);
+            setSolutionStatus("unsolved");
           }}
-          isSolved={isSolved}
+          solutionStatus={solutionStatus}
         />
         <TextButton
           className="absolute -top-9 -right-0 size-8 p-1 hover:bg-white/10"
@@ -137,8 +178,9 @@ export const Game = () => {
             );
             setIsValidPuzzle(true);
             setSteps(0);
-            setIsSolved(false);
+            setSolutionStatus("unsolved");
           }}
+          disabled={solutionStatus === "solving"}
         >
           <Icons.Puzzle />
         </TextButton>
@@ -150,9 +192,9 @@ export const Game = () => {
           setSteps(0);
           setBoard(initialBoard);
           setIsValidPuzzle(false);
-          setIsSolved(false);
+          setSolutionStatus("unsolved");
         }}
-        isPuzzleSolved={isSolved}
+        solutionStatus={solutionStatus}
         isClearDisabled={!board.some((r) => r.some(({ value }) => value !== 0))}
         onPuzzleValidate={() => {
           const solutions = countSolutions(
