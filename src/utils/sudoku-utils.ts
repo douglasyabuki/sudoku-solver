@@ -141,3 +141,69 @@ export const countSolutions = (input: number[][]): 0 | 1 | 2 => {
   solve();
   return solutions as 0 | 1 | 2;
 };
+
+export const generatePuzzle = (clues: number): number[][] => {
+  if (clues < 17 || clues > 25) {
+    throw new Error("Clues must be between 17 and 25.");
+  }
+
+  const grid: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0));
+
+  // Fill the grid completely using backtracking
+  const fillGrid = (): boolean => {
+    const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (grid[r][c] === 0) {
+          shuffle(nums);
+          for (const num of nums) {
+            if (isValidPlacement(grid, r, c, num)) {
+              grid[r][c] = num;
+              if (fillGrid()) return true;
+              grid[r][c] = 0;
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  fillGrid();
+
+  const puzzle = deepClone(grid);
+  const cells = Array.from({ length: 81 }, (_, i) => [
+    Math.floor(i / 9),
+    i % 9,
+  ]);
+  shuffle(cells);
+
+  let removed = 0;
+  const maxRemove = 81 - clues;
+
+  for (const [r, c] of cells) {
+    const backup = puzzle[r][c];
+    puzzle[r][c] = 0;
+
+    const solutionCount = countSolutions(puzzle);
+    if (solutionCount !== 1) {
+      puzzle[r][c] = backup; // restore if multiple solutions
+    } else {
+      removed++;
+    }
+
+    if (removed >= maxRemove) break;
+  }
+
+  return puzzle;
+};
+
+// Helper to shuffle an array in place
+const shuffle = <T>(arr: T[]): void => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+};

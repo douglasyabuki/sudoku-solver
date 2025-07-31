@@ -1,7 +1,13 @@
+import { Icons } from "@/icons/Icons";
 import type { Cell } from "@/types/types";
 import { deepClone } from "@/utils/deep-clone";
-import { countSolutions, findErrors } from "@/utils/sudoku-utils";
+import {
+  countSolutions,
+  findErrors,
+  generatePuzzle,
+} from "@/utils/sudoku-utils";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TextButton } from "../ui/text-button/TextButton";
 import { useToast } from "../ui/toast/toast-context/ToastContext";
 import { Actions } from "./actions/Actions";
 import { Board } from "./board/Board";
@@ -95,25 +101,48 @@ export const Game = () => {
         }}
       />
 
-      <Board
-        board={board}
-        onCellChange={(rowId: number, colId: number, value: number) => {
-          const copy = deepClone(
-            board.map((r) => r.map((c) => ({ ...c, error: false }))),
-          );
-          copy[rowId][colId] = { value, isFixed: value !== 0, error: false };
-          const errors = findErrors(
-            copy.map((r: Cell[]) => r.map((c: Cell) => c.value)),
-          );
-          errors.forEach(({ row, col }) => {
-            copy[row][col].error = true;
-          });
-          setBoard(copy);
-          setIsValidPuzzle(false);
-          setIsSolved(false);
-        }}
-        isSolved={isSolved}
-      />
+      <div className="relative flex flex-col">
+        <Board
+          board={board}
+          onCellChange={(rowId: number, colId: number, value: number) => {
+            const copy = deepClone(
+              board.map((r) => r.map((c) => ({ ...c, error: false }))),
+            );
+            copy[rowId][colId] = { value, isFixed: value !== 0, error: false };
+            const errors = findErrors(
+              copy.map((r: Cell[]) => r.map((c: Cell) => c.value)),
+            );
+            errors.forEach(({ row, col }) => {
+              copy[row][col].error = true;
+            });
+            setBoard(copy);
+            setIsValidPuzzle(false);
+            setIsSolved(false);
+          }}
+          isSolved={isSolved}
+        />
+        <TextButton
+          className="absolute -top-9 -right-0 size-8 p-1 hover:bg-white/10"
+          title="Generate random puzzle"
+          onClick={() => {
+            const newPuzzle = generatePuzzle(25);
+            setBoard(
+              newPuzzle.map((r) =>
+                r.map((value) => ({
+                  value,
+                  isFixed: value !== 0,
+                  error: false,
+                })),
+              ),
+            );
+            setIsValidPuzzle(true);
+            setSteps(0);
+            setIsSolved(false);
+          }}
+        >
+          <Icons.Puzzle />
+        </TextButton>
+      </div>
 
       <Actions
         isValidPuzzle={isValidPuzzle}
