@@ -125,7 +125,7 @@ export const Game = () => {
   }, [board]);
 
   return (
-    <div className="bg-circle flex h-screen flex-col items-center justify-center gap-6 py-20 md:justify-start md:gap-12 md:py-36">
+    <div className="bg-circle flex h-screen flex-col items-center justify-center gap-12 py-20 md:justify-start md:py-36">
       <StepTracker
         steps={steps}
         isStepSolutionToggled={isStepSolutionToggled}
